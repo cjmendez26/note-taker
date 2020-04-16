@@ -24,7 +24,7 @@ app.get("/api/notes", function (req, res) {
     fs.readFile(__dirname + "/db/db.json", function (err, data) {
         if (err) throw err;
         let notes = JSON.parse(data);
-        console.log(notes);
+        // console.log(notes);
         res.json(notes);
     });
 });
@@ -36,7 +36,7 @@ app.get("*", function (req, res) {
 
 app.post("/api/notes", function (req, res) {
     var newNote = req.body;
-    newNote.id = Date.now();
+    newNote.id = (Date.now()).toString();
     console.log(newNote);
     fs.readFile(__dirname + "/db/db.json", function (err, data) {
         if (err) throw err;
@@ -48,10 +48,33 @@ app.post("/api/notes", function (req, res) {
         });
     })
 });
-app.delete("/api/notes/:id", function(req, res){
-    console.log(req.params.id);
-    // read the file use loop to get the note by id delete it  
-})
+app.delete("/api/notes/:id", function (request, response) {
+    var deletedId = request.params.id;
+    console.log(deletedId);
+    fs.readFile(__dirname + "/db/db.json", function (err, data) {
+        if (err) throw err;
+        // console.log(data);
+        // // read the file use loop to get the note by id delete it 
+        let deleteNote = JSON.parse(data);
+        // console.log(deleteNote);
+        //    delete data[id];
+        // if given id matches current id
+        for (i = 0; i < deleteNote.length; i++) {
+            console.log(deleteNote[i].id,deletedId);
+            if(deleteNote[i].id === deletedId) {
+                deleteNote.splice(i, 1);
+                // console.log(deleteNote);
+                break;
+            }
+        }
+        fs.writeFile(__dirname + "/db/db.json", JSON.stringify(deleteNote), function () {
+            // console.log("testing function");
+        });
+
+        response.send("Removed");
+    });
+});
+
 
 // Starts the server to begin listening
 // =============================================================
